@@ -55,7 +55,7 @@ class ISO42K_Admin {
     add_action('wp_ajax_iso42k_delete_lead', ['ISO42K_Ajax', 'handle_delete_lead']);
     add_action('wp_ajax_iso42k_export_leads_csv', ['ISO42K_Ajax', 'handle_export_csv']);
     add_action('wp_ajax_iso42k_write_test_log', ['ISO42K_Ajax', 'handle_write_test_log']);
-}
+  }
   
   
   public static function register_settings() {
