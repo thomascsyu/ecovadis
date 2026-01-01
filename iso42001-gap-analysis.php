@@ -36,6 +36,7 @@ if (!defined('DUO_ISO42K_URL')) {
 // Core classes
 require_once DUO_ISO42K_PATH . 'includes/class-iso42k-logger.php';
 require_once DUO_ISO42K_PATH . 'includes/class-iso42k-leads.php';
+require_once DUO_ISO42K_PATH . 'includes/class-iso42k-admin-leads.php';
 require_once DUO_ISO42K_PATH . 'includes/class-iso42k-pdf.php';
 require_once DUO_ISO42K_PATH . 'includes/class-iso42k-email.php';
 require_once DUO_ISO42K_PATH . 'includes/class-iso42k-ai.php';
