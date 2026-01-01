@@ -1,0 +1,38 @@
+/* ISO 42001 Assessment Shortcode Styles */
+.iso42k-assessment-wrapper {
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+}
+
+.iso42k-assessment-question {
+    transition: background 0.2s ease;
+}
+
+.iso42k-assessment-question:hover {
+    background: #f9f9f9;
+}
+
+.iso42k-save-progress:hover,
+.iso42k-submit-assessment:hover {
+    opacity: 0.9;
+}
+
+/* 响应式适配 */
+@media screen and (max-width: 768px) {
+    .iso42k-assessment-wrapper {
+        width: 100% !important;
+        padding: 15px !important;
+    }
+    
+    .iso42k-assessment-actions {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .iso42k-save-progress,
+    .iso42k-submit-assessment {
+        width: 100%;
+        margin-left: 0 !important;
+    }
+}

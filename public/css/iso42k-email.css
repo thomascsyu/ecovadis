@@ -1,0 +1,31 @@
+/* ISO42K Email stylesheet (reference).
+   Emails are best styled inline for compatibility.
+*/
+
+.iso42k-email-wrap{
+  background:#f6f7f9;
+  padding:24px 0;
+}
+
+.iso42k-email-card{
+  max-width:680px;
+  margin:0 auto;
+  background:#ffffff;
+  border:1px solid #e6e8eb;
+  border-radius:12px;
+  overflow:hidden;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+  color:#111827;
+}
+
+.iso42k-email-header{
+  padding:22px 24px;
+  border-bottom:1px solid #eef0f3;
+}
+
+.iso42k-email-footer{
+  padding:14px 24px;
+  background:#fbfbfc;
+  color:#6b7280;
+  font-size:12px;
+}
