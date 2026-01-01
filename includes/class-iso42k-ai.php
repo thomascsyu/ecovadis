@@ -3,10 +3,10 @@ if (!defined('ABSPATH')) exit;
 
 /**
  * ISO42K_AI
- * AI-powered gap analysis integration for ISO/IEC 42001:2023 (AIMS)
- * * @version 1.0.0
+ * AI-powered gap analysis integration for EcoVadis Sustainability Assessment
+ * * @version 2.0.0
  * * Note: This class generates structured AI content in 7 sections specifically tailored
- * for Artificial Intelligence Management Systems (AIMS).
+ * for EcoVadis sustainability and CSR assessment framework.
  */
 
 // Register email settings
@@ -116,7 +116,7 @@ public static function analyse(array $answers): array {
             'messages' => [
                 [
                     'role' => 'system',
-                    'content' => 'You are an ISO/IEC 42001:2023 Lead Auditor and AI Governance Expert. Provide a professional gap analysis in a clear, structured format with exactly these 7 sections: 1) Key Insights, 2) Overview, 3) Current State, 4) Risk Implications, 5) Top Gaps, 6) Recommendations, 7) Quick Win Actions. Your focus is on AI Management Systems (AIMS), specifically addressing AI risk, data quality, human oversight, and algorithmic transparency. Write in plain text without markdown.'
+                    'content' => 'You are an EcoVadis sustainability and CSR expert. Provide a professional gap analysis in a clear, structured format with exactly these 7 sections: 1) Key Insights, 2) Overview, 3) Current State, 4) Risk Implications, 5) Top Gaps, 6) Recommendations, 7) Quick Win Actions. Your focus is on sustainability across Environment, Labor & Human Rights, Ethics, and Sustainable Procurement themes. Write in plain text without markdown.'
                 ],
                 [
                     'role' => 'user',
@@ -187,42 +187,87 @@ public static function analyse(array $answers): array {
         
         $a_count = 0; $b_count = 0; $c_count = 0;
 
-        // Load ISO 42001 questions
-        // Ensure you have defined this constant to point to your new questions.php
-        $questions = include DUO_ISO42K_PATH . 'data/questions.php';
+        // Load EcoVadis questions with company size detection
+        $company_size = 'small';
+        if ($total >= 25) {
+            $company_size = 'large';
+        } elseif ($total > 20) {
+            $company_size = 'large'; // Has procurement questions
+        }
         
-        $detailed_responses = "DETAILED ISO 42001 QUESTION-ANSWER PAIRS:\n";
+        $questions_loader = include DUO_ISO42K_PATH . 'data/questions.php';
+        if (is_callable($questions_loader)) {
+            $questions = $questions_loader($company_size);
+        } else {
+            $questions = $questions_loader;
+        }
+        
+        $detailed_responses = "DETAILED ECOVADIS QUESTION-ANSWER PAIRS:\n";
         foreach ($answers as $index => $answer) {
-            if (isset($questions[$index])) {
-                $question = $questions[$index];
+            $question = null;
+            
+            // Try to find question by ID or index
+            foreach ($questions as $q) {
+                if ($q['id'] === $index || array_search($q, $questions) == $index) {
+                    $question = $q;
+                    break;
+                }
+            }
+            
+            if ($question) {
                 $ans = strtoupper(trim($answer));
                 
                 if ($ans === 'A') $a_count++;
                 elseif ($ans === 'B') $b_count++;
                 else $c_count++;
                 
-                $answer_meaning = ($ans === 'A') ? 'Fully Implemented' : (($ans === 'B') ? 'Partially Implemented' : 'Not Implemented');
+                $answer_meaning = ($ans === 'A') ? 'Advanced - Fully Implemented' : (($ans === 'B') ? 'Basic - Partially Implemented' : 'Absent - Not Implemented');
                 
-                $detailed_responses .= "Q{$question['id']} ({$question['theme']}): {$question['text']}\n";
-                $detailed_responses .= "Status: {$answer_meaning} ({$ans})\n\n";
+                $detailed_responses .= "{$question['id']} ({$question['theme']} - {$question['indicator']}): {$question['question']}\n";
+                $detailed_responses .= "Status: {$answer_meaning} ({$ans})\n";
+                $detailed_responses .= "Impact Level: " . ucfirst($question['impact']) . "\n\n";
             }
         }
 
-        $score_percent = $total > 0 ? round((($a_count * 10 + $b_count * 6) / ($total * 10)) * 100) : 0;
+        // Calculate weighted score
+        $max_weighted_score = 0;
+        $total_weighted_score = 0;
+        
+        foreach ($questions as $index => $question) {
+            $impact = $question['impact'] ?? 'medium';
+            $weight = ($impact === 'high') ? 1.5 : (($impact === 'low') ? 0.5 : 1.0);
+            $max_weighted_score += (100 * $weight);
+            
+            $answer = null;
+            if (isset($answers[$question['id']])) {
+                $answer = strtoupper(trim($answers[$question['id']]));
+            } elseif (isset($answers[$index])) {
+                $answer = strtoupper(trim($answers[$index]));
+            }
+            
+            if ($answer === 'A') {
+                $total_weighted_score += (100 * $weight);
+            } elseif ($answer === 'B') {
+                $total_weighted_score += (50 * $weight);
+            }
+        }
+        
+        $score_percent = $max_weighted_score > 0 ? round(($total_weighted_score / $max_weighted_score) * 100) : 0;
 
         $maturity = 'Initial';
-        if ($score_percent >= 75) $maturity = 'Optimised';
-        elseif ($score_percent >= 50) $maturity = 'Established';
-        elseif ($score_percent >= 25) $maturity = 'Managed';
+        if ($score_percent >= 86) $maturity = 'Leading';
+        elseif ($score_percent >= 71) $maturity = 'Advanced';
+        elseif ($score_percent >= 51) $maturity = 'Established';
+        elseif ($score_percent >= 31) $maturity = 'Developing';
 
         $answer_summary = "Total Questions: {$total}\n";
-        $answer_summary .= "Fully Implemented (A): {$a_count}\n";
-        $answer_summary .= "Partially Implemented (B): {$b_count}\n";
+        $answer_summary .= "Advanced Implementation (A): {$a_count}\n";
+        $answer_summary .= "Basic Implementation (B): {$b_count}\n";
         $answer_summary .= "Not Implemented (C): {$c_count}\n";
-        $answer_summary .= "AIMS Maturity Score: {$score_percent}%\n";
+        $answer_summary .= "EcoVadis Maturity Score: {$score_percent}%\n";
 
         $prompt = <<<PROMPT
-You are an expert in ISO/IEC 42001:2023 (Artificial Intelligence Management System). Analyze the following self-assessment responses to provide a gap analysis.
+You are an expert in sustainability and CSR assessment frameworks, specializing in EcoVadis methodology. Analyze the following self-assessment responses to provide a gap analysis.
 
 ASSESSMENT METRICS:
 {$answer_summary}
@@ -231,30 +276,31 @@ Maturity Level: {$maturity}
 {$detailed_responses}
 
 REQUIRED SECTIONS:
-1) Key Insights
-Analyze the AIMS posture. Highlight strengths in AI governance and concerns regarding AI risk management, data quality, or lifecycle controls.
 
-2) Overview
-Summarize findings across themes (Leadership, Planning, Operation, Support). Identify if the organization treats AI as a standard IT issue (incorrect) or manages specific AI risks like bias, explainability, and autonomy (correct).
+Key Insights
+Analyze the organization's sustainability posture. Highlight strengths in governance and policy implementation, and identify critical concerns regarding environmental management, labor practices, ethical compliance, or supply chain sustainability.
 
-3) Current State
-Describe the existing AI governance posture. Which controls are working? Are AI policies defined? Is there human oversight?
+Overview
+Summarize findings across themes (General, Environment, Labor & Human Rights, Ethics, and if applicable, Sustainable Procurement). Identify if the organization approaches sustainability as a compliance exercise (reactive) or as a strategic, integrated business function (proactive).
 
-4) Risk Implications
-Explain risks from the identified gaps (specifically B and C answers). Focus on:
-- Ethical risks (bias, discrimination)
-- Operational risks (model drift, hallucinations)
-- Compliance risks (regulatory penalties)
-- Reputational risks (loss of trust)
+Current State
+Describe the existing sustainability management system. Which controls and practices are effectively implemented? Are policies comprehensive and operational? Is there measurable performance tracking and reporting?
 
-5) Top Gaps
-List the 5 most critical ISO 42001 gaps. Prioritize by severity. Example: "Lack of AI System Impact Assessment" or "Undefined Data Provenance."
+Risk Implications
+Explain the business risks arising from identified gaps (specifically B and C answers). Focus on:
+- Environmental risks (regulatory fines, resource inefficiency, climate impact)
+- Social risks (employee turnover, safety incidents, labor disputes, reputational damage)
+- Governance risks (corruption incidents, data breaches, compliance failures)
+- Supply chain risks (disruptions, non-compliance of suppliers, reputational contagion)
 
-6) Recommendations
-Provide 5 actionable steps to address the top gaps. Reference specific ISO 42001 clauses or Annex A controls (e.g., A.6.2.4 Verification and Validation).
+Top Gaps
+List the 5 most critical sustainability management gaps. Prioritize by potential impact on score, risk severity, and alignment with stakeholder expectations. Example: "Absence of a comprehensive GHG emissions inventory" or "Lack of a formal supplier code of conduct."
 
-7) Quick Win Actions
-List 5 immediate, low-effort actions (e.g., "Draft an AI Policy," "Create an AI System Inventory," "Assign AI Management roles").
+Recommendations
+Provide 5 actionable, strategic steps to address the top gaps and improve maturity. Reference specific thematic areas and indicators (e.g., "Develop and implement a formal Energy & GHG Reduction Policy per ENV100," "Establish a comprehensive DEI program as per LAB365").
+
+Quick Win Actions
+List 5 immediate, practical actions that can yield rapid improvements in score or risk posture with relatively low effort (e.g., "Formalize existing ad-hoc recycling into a written Waste Management program," "Document and communicate the existing health & safety practices as a formal policy," "Initiate tracking of key energy consumption metrics").
 
 FORMATTING RULES:
 - Use exact section titles.
@@ -262,96 +308,121 @@ FORMATTING RULES:
 - Professional tone.
 - Separate sections with double line breaks.
 
-Generate the analysis now:
+Generate the analysis now.
 PROMPT;
 
         return $prompt;
     }
 
     /**
-     * Analyze answers for maturity scoring
+     * Analyze answers for maturity scoring (EcoVadis methodology)
      */
     private static function analyze_answers_for_maturity(array $answers): array {
         $total = count($answers);
         if ($total === 0) return ['percent' => 0, 'maturity' => 'Initial'];
         
-        $a_count = 0; $b_count = 0; 
+        // Use EcoVadis scoring methodology
+        $company_size = ($total > 20) ? 'large' : 'small';
+        
+        if (class_exists('ISO42K_Scoring')) {
+            $result = ISO42K_Scoring::calculate_score($answers, $company_size);
+            
+            $maturity_map = [
+                'initial' => 'Initial',
+                'developing' => 'Developing',
+                'established' => 'Established',
+                'advanced' => 'Advanced',
+                'leading' => 'Leading'
+            ];
+            
+            $maturity = $maturity_map[$result['maturity_level']] ?? 'Initial';
+            
+            return [
+                'percent' => $result['percentage'],
+                'maturity' => $maturity
+            ];
+        }
+        
+        // Fallback calculation if scoring class not available
+        $a_count = 0; $b_count = 0;
         foreach ($answers as $answer) {
             $ans = strtoupper(trim($answer));
             if ($ans === 'A') $a_count++;
             elseif ($ans === 'B') $b_count++;
         }
 
-        $score_percent = round((($a_count * 10 + $b_count * 6) / ($total * 10)) * 100);
+        // Simple weighted average: A=100, B=50, C=0
+        $score_percent = round((($a_count * 100 + $b_count * 50) / ($total * 100)) * 100);
 
         $maturity = 'Initial';
-        if ($score_percent >= 75) $maturity = 'Optimised';
-        elseif ($score_percent >= 50) $maturity = 'Established';
-        elseif ($score_percent >= 25) $maturity = 'Managed';
+        if ($score_percent >= 86) $maturity = 'Leading';
+        elseif ($score_percent >= 71) $maturity = 'Advanced';
+        elseif ($score_percent >= 51) $maturity = 'Established';
+        elseif ($score_percent >= 31) $maturity = 'Developing';
 
         return ['percent' => $score_percent, 'maturity' => $maturity];
     }
 
     /**
-     * Get predefined analysis based on ISO 42001 maturity
-     * Adapted specifically for AI Management Systems
+     * Get predefined analysis based on EcoVadis maturity
+     * Adapted specifically for Sustainability and CSR Assessment
      */
     private static function get_predefined_analysis(string $maturity, int $percent): string {
-        $analysis = "1) Key Insights\n";
+        $analysis = "Key Insights\n";
         
         if ($maturity === 'Initial') {
-            $analysis .= "Your organization's AI maturity is at the {$maturity} level ({$percent}%). This suggests AI usage may be occurring in 'shadow' pockets without formal governance, policy, or risk assessment. The priority is establishing an AI Policy and determining the scope of your AI Management System.\n\n";
-        } elseif ($maturity === 'Managed') {
-            $analysis .= "Your organization's AI maturity is {$maturity} ({$percent}%). You likely have some AI guidelines, but they are not consistently applied across the AI lifecycle. Risk assessments may be generic rather than AI-specific (missing bias or explainability checks).\n\n";
+            $analysis .= "Your organization's sustainability maturity is at the {$maturity} level ({$percent}%). This suggests minimal sustainability practices with ad hoc or non-existent policies. The priority is establishing foundational sustainability policies and beginning systematic tracking of environmental and social metrics.\n\n";
+        } elseif ($maturity === 'Developing') {
+            $analysis .= "Your organization's sustainability maturity is {$maturity} ({$percent}%). You have a basic sustainability framework with partial policy implementation. The focus should be on strengthening existing initiatives and expanding coverage across all sustainability themes.\n\n";
         } elseif ($maturity === 'Established') {
-            $analysis .= "Your organization's AI maturity is {$maturity} ({$percent}%). You have a defined AIMS with impact assessments and data governance. The priority is now on continuous monitoring of models in production and managing third-party AI suppliers.\n\n";
+            $analysis .= "Your organization's sustainability maturity is {$maturity} ({$percent}%). You have systematic sustainability programs with comprehensive policies. The priority now is on continuous improvement, external verification, and supply chain engagement.\n\n";
+        } elseif ($maturity === 'Advanced') {
+            $analysis .= "Your organization is {$maturity} ({$percent}%) in sustainability. You have integrated sustainability strategy with industry-leading practices. Focus on innovation, thought leadership, and setting industry benchmarks.\n\n";
         } else {
-            $analysis .= "Your organization is {$maturity} ({$percent}%) in AI governance. You have robust controls for ethical AI, data provenance, and automated compliance. The focus should be on advanced auditing and adapting to new AI regulations.\n\n";
+            $analysis .= "Your organization is {$maturity} ({$percent}%) in sustainability. You have sustainability deeply embedded in your business model with full transparency and third-party verification. Continue driving innovation and influencing your broader value chain.\n\n";
         }
 
-        $analysis .= "2) Overview\n";
-        $analysis .= "Based on your responses, there are gaps in how AI specific risks are handled. Unlike standard IT, AI requires continuous monitoring for model drift, bias, and data quality. Your current setup may treat AI too similarly to standard software.\n\n";
+        $analysis .= "Overview\n";
+        $analysis .= "Based on your responses, there are opportunities to strengthen sustainability management across Environment, Labor & Human Rights, Ethics, and Procurement themes. Leading organizations integrate sustainability into strategic decision-making rather than treating it as a compliance exercise.\n\n";
 
-        $analysis .= "3) Current State\n";
-        if ($maturity === 'Initial') {
-            $analysis .= "AI activities are likely ad-hoc. There is no central register of AI systems, and roles for 'AI Oversight' are undefined. Data used for training or fine-tuning is likely not tracked for provenance.\n\n";
-        } elseif ($maturity === 'Managed') {
-            $analysis .= "Basic AI controls exist but are manual. You may have an AI policy, but developers or users might bypass it. Impact assessments are performed occasionally but not systematically for every new AI deployment.\n\n";
+        $analysis .= "Current State\n";
+        if ($maturity === 'Initial' || $maturity === 'Developing') {
+            $analysis .= "Sustainability activities appear to be early-stage or reactive. Policies may exist on paper but lack consistent implementation. Metrics tracking is limited or non-existent. Employee engagement and training on sustainability topics needs development.\n\n";
         } else {
-            $analysis .= "A formal AIMS is in place. AI risks are documented, and data quality checks are integrated into the development pipeline. Human oversight mechanisms are defined.\n\n";
+            $analysis .= "A formal sustainability management system is in place with documented policies and procedures. Regular monitoring and reporting occur, though there may be gaps in external verification or supply chain oversight. Continuous improvement processes are active.\n\n";
         }
 
-        $analysis .= "4) Risk Implications\n";
-        $analysis .= "The primary risks identified include: 1) Unintended bias or discrimination in AI outputs leading to reputational damage. 2) Lack of explainability making it difficult to debug errors. 3) 'Black box' risks where decision-making logic is unknown. 4) Regulatory non-compliance with emerging AI laws.\n\n";
+        $analysis .= "Risk Implications\n";
+        $analysis .= "Key risks identified include: 1) Environmental risks such as regulatory non-compliance, resource inefficiency, and climate-related impacts. 2) Social risks including employee safety incidents, labor disputes, and reputational damage. 3) Ethical risks involving corruption, data breaches, and compliance failures. 4) Supply chain risks from supplier non-compliance and potential disruptions.\n\n";
 
-        $analysis .= "5) Top Gaps\n";
-        if ($maturity === 'Initial') {
-            $analysis .= "1. Lack of a formal AI Policy (Clause 5.2)\n";
-            $analysis .= "2. Undefined AI Risk Assessment criteria (Clause 6.1.2)\n";
-            $analysis .= "3. No AI System Impact Assessment process (Clause 6.1.4)\n";
-            $analysis .= "4. Missing data quality and provenance controls (Annex A.7)\n";
-            $analysis .= "5. Undefined roles for AI human oversight (Annex A.9)\n\n";
+        $analysis .= "Top Gaps\n";
+        if ($maturity === 'Initial' || $maturity === 'Developing') {
+            $analysis .= "1. Absence of comprehensive environmental policy (energy, GHG, waste)\n";
+            $analysis .= "2. Limited tracking of sustainability metrics and KPIs\n";
+            $analysis .= "3. Lack of formal health and safety management system\n";
+            $analysis .= "4. No external verification of sustainability reporting\n";
+            $analysis .= "5. Missing supplier sustainability assessment process\n\n";
         } else {
-            $analysis .= "1. Incomplete AI system inventory and classification\n";
-            $analysis .= "2. Inconsistent monitoring of AI models in production (Drift)\n";
-            $analysis .= "3. Third-party AI supplier due diligence gaps\n";
-            $analysis .= "4. Insufficient transparency/documentation for users\n";
-            $analysis .= "5. Lack of formal model validation procedures\n\n";
+            $analysis .= "1. Incomplete Scope 3 GHG emissions calculation\n";
+            $analysis .= "2. Limited renewable energy adoption\n";
+            $analysis .= "3. Diversity, equity, and inclusion programs need strengthening\n";
+            $analysis .= "4. Supply chain sustainability engagement could be deeper\n";
+            $analysis .= "5. External verification of sustainability data needed\n\n";
         }
 
-        $analysis .= "6) Recommendations\n";
-        $analysis .= "1. Establish a governing body or committee responsible for AI.\n";
-        $analysis .= "2. Develop and publish an AI Policy covering ethical principles and risk tolerance.\n";
-        $analysis .= "3. Implement an AI Impact Assessment (AIA) for all new projects.\n";
-        $analysis .= "4. Create a data governance framework specifically for training/testing data.\n";
-        $analysis .= "5. Define clear 'Human-in-the-loop' protocols for critical AI decisions.\n\n";
+        $analysis .= "Recommendations\n";
+        $analysis .= "1. Develop a comprehensive sustainability strategy with board-level oversight and clear targets aligned with SDGs or Science-Based Targets.\n";
+        $analysis .= "2. Implement robust environmental management including energy reduction, GHG inventory (Scopes 1, 2, 3), and waste management programs.\n";
+        $analysis .= "3. Strengthen labor practices with comprehensive health & safety policies, regular training, and diversity and inclusion initiatives.\n";
+        $analysis .= "4. Establish strong ethics framework with anti-corruption measures, data security, and whistleblower mechanisms.\n";
+        $analysis .= "5. Develop supplier sustainability program with code of conduct, assessments, and capacity building.\n\n";
 
-        $analysis .= "7) Quick Win Actions\n";
-        $analysis .= "1. Create an inventory of all AI tools currently in use.\n";
-        $analysis .= "2. Draft a simple Acceptable Use Policy for AI (e.g., ChatGPT usage).\n";
-        $analysis .= "3. Assign a specific owner for AI compliance.\n";
-        $analysis .= "4. Require vendors to disclose if AI is used in their products.\n";
-        $analysis .= "5. Conduct a basic AI literacy training session for staff.\n";
+        $analysis .= "Quick Win Actions\n";
+        $analysis .= "1. Document existing sustainability practices into formal written policies.\n";
+        $analysis .= "2. Start tracking basic environmental metrics (energy, water, waste).\n";
+        $analysis .= "3. Conduct employee sustainability awareness training.\n";
+        $analysis .= "4. Request sustainability information from key suppliers.\n";
+        $analysis .= "5. Assign clear responsibility for sustainability to a senior leader or committee.\n";
 
         return $analysis;
     }

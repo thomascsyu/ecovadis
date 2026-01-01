@@ -169,27 +169,31 @@
   }
 
   function computePercent(total) {
-    var map = { A: 10, B: 5, C: 0 };
+    // EcoVadis scoring: A=100, B=50, C=0 (simplified client-side calculation)
+    // Note: Server-side uses impact weighting, but for progress display we use simple average
+    var map = { A: 100, B: 50, C: 0 };
     var score = 0;
     for (var i = 0; i < total; i++) {
       var a = (STATE.answers[i] || 'C').toUpperCase();
       score += (map[a] != null ? map[a] : 0);
     }
-    return Math.round((score / (total * 10)) * 100);
+    return Math.round((score / (total * 100)) * 100);
   }
 
   function computeMaturity(percent) {
-    if (percent >= 75) return 'Optimised';
-    if (percent >= 50) return 'Established';
-    if (percent >= 25) return 'Managed';
+    if (percent >= 86) return 'Leading';
+    if (percent >= 71) return 'Advanced';
+    if (percent >= 51) return 'Established';
+    if (percent >= 31) return 'Developing';
     return 'Initial';
   }
 
   function maturityExplain(maturity) {
-    if (maturity === 'Initial') return 'Controls are largely ad hoc or incomplete. Priority is establishing baseline policies, ownership, and key technical controls.';
-    if (maturity === 'Managed') return 'A foundation exists, but implementation may be inconsistent. Priority is standardising processes and improving coverage.';
-    if (maturity === 'Established') return 'Controls are broadly implemented and defined. Priority is strengthening monitoring, measurement, and continual improvement.';
-    if (maturity === 'Optimised') return 'Controls are mature, measured, and continuously improved. Priority is automation, metrics, and proactive threat management.';
+    if (maturity === 'Initial') return 'Minimal sustainability practices. Ad hoc or non-existent policies. Priority is establishing foundational sustainability policies and systematic tracking.';
+    if (maturity === 'Developing') return 'Basic sustainability framework with partial policy implementation. Focus on strengthening existing initiatives and expanding coverage across all themes.';
+    if (maturity === 'Established') return 'Systematic sustainability programs with comprehensive policies. Priority is continuous improvement, external verification, and supply chain engagement.';
+    if (maturity === 'Advanced') return 'Integrated sustainability strategy with industry-leading practices. Focus on innovation, thought leadership, and setting industry benchmarks.';
+    if (maturity === 'Leading') return 'Sustainability deeply embedded in business model with full transparency and third-party verification. Continue driving innovation and influencing your value chain.';
     return '';
   }
 

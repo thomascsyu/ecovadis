@@ -1,5 +1,5 @@
 /**
- * ISO 42001 Public Script (Autosave + Step Navigation)
+ * EcoVadis Self Assessment Public Script (Autosave + Step Navigation)
  */
 document.addEventListener('DOMContentLoaded', function() {
     // 检查是否已定义全局变量
