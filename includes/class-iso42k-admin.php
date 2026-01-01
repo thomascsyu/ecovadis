@@ -150,12 +150,16 @@ class ISO42K_Admin {
       56
     );
 
-    // Remove duplicate submenu
-    add_action('admin_menu', function () {
-      remove_submenu_page('iso42k-dashboard', 'iso42k-dashboard');
-    }, 999);
-
     // Submenus
+    add_submenu_page(
+      'iso42k-dashboard',
+      'Dashboard',
+      'Dashboard',
+      'manage_options',
+      'iso42k-dashboard',
+      [__CLASS__, 'render_dashboard']
+    );
+
     add_submenu_page(
       'iso42k-dashboard',
       'Leads',
