@@ -23,14 +23,10 @@ class ISO42K_Questions {
     /**
      * Get all questions from data file
      * 
-     * @return array Array of questions with id, theme, and text
+     * @param string $company_size Company size (small, medium, large)
+     * @return array Array of questions with id, theme, indicator, question, options, and impact
      */
-    public static function get_all() {
-        // Return cached questions if available
-        if (self::$questions_cache !== null) {
-            return self::$questions_cache;
-        }
-
+    public static function get_all($company_size = 'small') {
         // Load questions from data file
         $questions_file = DUO_ISO42K_PATH . 'data/questions.php';
         
@@ -40,16 +36,20 @@ class ISO42K_Questions {
         }
 
         try {
-            $questions = require_once $questions_file;
+            $questions_loader = require $questions_file;
+            
+            // The questions file now returns a function that accepts company size
+            if (is_callable($questions_loader)) {
+                $questions = $questions_loader($company_size);
+            } else {
+                $questions = $questions_loader;
+            }
             
             // Validate questions data
             if (!is_array($questions) || empty($questions)) {
                 ISO42K_Logger::log('⚠️ Questions data is empty or invalid');
                 return [];
             }
-
-            // Cache the questions
-            self::$questions_cache = $questions;
             
             return $questions;
         } catch (Exception $e) {
@@ -61,11 +61,12 @@ class ISO42K_Questions {
     /**
      * Get a single question by ID
      * 
-     * @param int $id Question ID
+     * @param string $id Question ID (e.g., 'GEN200', 'ENV100')
+     * @param string $company_size Company size (small, medium, large)
      * @return array|null Question data or null if not found
      */
-    public static function get_by_id($id) {
-        $questions = self::get_all();
+    public static function get_by_id($id, $company_size = 'small') {
+        $questions = self::get_all($company_size);
         
         foreach ($questions as $question) {
             if (isset($question['id']) && $question['id'] == $id) {
@@ -80,10 +81,11 @@ class ISO42K_Questions {
      * Get question by index
      * 
      * @param int $index Zero-based question index
+     * @param string $company_size Company size (small, medium, large)
      * @return array|null Question data or null if index is invalid
      */
-    public static function get_by_index($index) {
-        $questions = self::get_all();
+    public static function get_by_index($index, $company_size = 'small') {
+        $questions = self::get_all($company_size);
         
         if (isset($questions[$index])) {
             return $questions[$index];
@@ -95,10 +97,11 @@ class ISO42K_Questions {
     /**
      * Get total number of questions
      * 
+     * @param string $company_size Company size (small, medium, large)
      * @return int Number of questions
      */
-    public static function get_count() {
-        $questions = self::get_all();
+    public static function get_count($company_size = 'small') {
+        $questions = self::get_all($company_size);
         return count($questions);
     }
 
@@ -106,10 +109,11 @@ class ISO42K_Questions {
      * Get questions by theme
      * 
      * @param string $theme Theme name
+     * @param string $company_size Company size (small, medium, large)
      * @return array Array of questions for the specified theme
      */
-    public static function get_by_theme($theme) {
-        $questions = self::get_all();
+    public static function get_by_theme($theme, $company_size = 'small') {
+        $questions = self::get_all($company_size);
         $filtered = [];
         
         foreach ($questions as $question) {
@@ -124,10 +128,11 @@ class ISO42K_Questions {
     /**
      * Get all unique themes
      * 
+     * @param string $company_size Company size (small, medium, large)
      * @return array Array of theme names
      */
-    public static function get_themes() {
-        $questions = self::get_all();
+    public static function get_themes($company_size = 'small') {
+        $questions = self::get_all($company_size);
         $themes = [];
         
         foreach ($questions as $question) {
@@ -144,10 +149,11 @@ class ISO42K_Questions {
      * 
      * @param int $start_index Starting index (0-based)
      * @param int $count Number of questions to retrieve
+     * @param string $company_size Company size (small, medium, large)
      * @return array Array of questions
      */
-    public static function get_batch($start_index, $count) {
-        $questions = self::get_all();
+    public static function get_batch($start_index, $count, $company_size = 'small') {
+        $questions = self::get_all($company_size);
         $total = count($questions);
         
         // Ensure valid range
@@ -160,15 +166,6 @@ class ISO42K_Questions {
         }
         
         return array_slice($questions, $start_index, $count);
-    }
-
-    /**
-     * Clear the questions cache
-     * 
-     * @return void
-     */
-    public static function clear_cache() {
-        self::$questions_cache = null;
     }
 
 }

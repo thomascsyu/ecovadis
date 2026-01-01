@@ -1,11 +1,11 @@
 <?php
 /**
- * Plugin Name: ISO 42001 Gap Analysis
- * Description: ISO 42001/2023 self-assessment gap analysis with maturity scoring.
- * Version: 7.1.5
+ * Plugin Name: EcoVadis Self Assessment
+ * Description: EcoVadis sustainability self-assessment with maturity scoring across Environment, Labor, Ethics, and Procurement themes.
+ * Version: 1.0.0
  * Author: Your Company
  * License: GPL v2 or later
- * Text Domain: iso42001-gap-analysis
+ * Text Domain: ecovadis-self-assessment
  */
 
 if (!defined('ABSPATH')) {

@@ -5,9 +5,9 @@ if (!defined('ABSPATH')) {
 
 /**
  * ISO42K_Assessment
- * Handles assessment calculation and processing
+ * Handles assessment calculation and processing for EcoVadis
  * 
- * @version 7.3.0
+ * @version 2.0.0
  */
 if (!class_exists('ISO42K_Assessment')) {
 
@@ -76,15 +76,16 @@ class ISO42K_Assessment {
     }
     
     /**
-     * Convert staff number to company size string
+     * Convert staff number to company size string for EcoVadis
+     * Large companies (25+ staff) receive additional procurement questions
      */
     private function getCompanySizeFromStaff($staff) {
-        if ($staff <= 10) {
-            return 'small';
-        } elseif ($staff <= 50) {
+        if ($staff >= 25) {
+            return 'large';
+        } elseif ($staff >= 10) {
             return 'medium';
         } else {
-            return 'large';
+            return 'small';
         }
     }
     
@@ -94,10 +95,10 @@ class ISO42K_Assessment {
     private function convertMaturityFormat($maturity_level) {
         $maturity_map = [
             'initial' => 'Initial',
-            'managed' => 'Managed', 
-            'defined' => 'Established',
-            'quantitative' => 'Established',
-            'optimizing' => 'Optimised'
+            'developing' => 'Developing',
+            'established' => 'Established',
+            'advanced' => 'Advanced',
+            'leading' => 'Leading'
         ];
         
         return isset($maturity_map[$maturity_level]) ? $maturity_map[$maturity_level] : 'Initial';

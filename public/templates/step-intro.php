@@ -2,16 +2,16 @@
 
 <section id="iso42k-step-intro" class="iso42k-step is-active">
   <div class="iso42k-hero">
-    <h1 class="iso42k-title">ISO 42001 SELF ASSESSMENT</h1>
-    <p class="iso42k-subtitle">Discover your company's information security maturity level with our assessment</p>
+    <h1 class="iso42k-title">ECOVADIS SELF ASSESSMENT</h1>
+    <p class="iso42k-subtitle">Discover your company's sustainability maturity level with our comprehensive assessment</p>
 
     <div class="iso42k-expect">
       <h3 class="iso42k-expect-title">What to expect:</h3>
       <ul class="iso42k-expect-list">
-        <li>Answer questions aligned to ISO 42001/2023 controls</li>
-        <li>Receive a maturity snapshot and recommended next steps</li>
-        <li>Get results by email in a professional format</li>
-        <li>Duration: approximately 10 minutes</li>
+        <li>Answer questions across Environment, Labor & Human Rights, Ethics, and Procurement themes</li>
+        <li>Receive a sustainability maturity score and actionable recommendations</li>
+        <li>Get detailed results by email in a professional format</li>
+        <li>Duration: approximately 10-15 minutes</li>
       </ul>
     </div>
 
@@ -26,11 +26,11 @@
       <select id="iso42k-staff" class="iso42k-input" required>
         <option value="">Select staff count...</option>
         <option value="1-10">1-10 employees</option>
-        <option value="11-20">11-20 employees</option>
-        <option value="20+">20+ employees</option>
+        <option value="11-24">11-24 employees</option>
+        <option value="25+">25+ employees (includes Procurement questions)</option>
       </select>
       
-      <div class="iso42k-center-note">Your answers are confidential.</div>
+      <div class="iso42k-center-note">Your answers are confidential and will help assess your sustainability practices.</div>
 
       <button id="iso42k-start" class="iso42k-btn-primary" type="button">Begin Assessment →</button>
 

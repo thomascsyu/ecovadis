@@ -20,24 +20,24 @@
       <button type="button" class="iso42k-option" data-answer="A">
         <div class="iso42k-option-key">A</div>
         <div class="iso42k-option-text">
-          <strong id="iso42k-opt-a-title">Fully implemented</strong>
-          <div id="iso42k-opt-a-hint" class="iso42k-option-hint">Documented and consistently applied</div>
+          <strong id="iso42k-opt-a-title">Advanced - Fully implemented</strong>
+          <div id="iso42k-opt-a-hint" class="iso42k-option-hint">Comprehensive practices fully documented and consistently applied</div>
         </div>
       </button>
 
       <button type="button" class="iso42k-option" data-answer="B">
         <div class="iso42k-option-key">B</div>
         <div class="iso42k-option-text">
-          <strong id="iso42k-opt-b-title">Partially implemented</strong>
-          <div id="iso42k-opt-b-hint" class="iso42k-option-hint">Implemented in some areas or inconsistent</div>
+          <strong id="iso42k-opt-b-title">Basic - Partially implemented</strong>
+          <div id="iso42k-opt-b-hint" class="iso42k-option-hint">Some measures in place or inconsistent implementation</div>
         </div>
       </button>
 
       <button type="button" class="iso42k-option" data-answer="C">
         <div class="iso42k-option-key">C</div>
         <div class="iso42k-option-text">
-          <strong id="iso42k-opt-c-title">Not implemented</strong>
-          <div id="iso42k-opt-c-hint" class="iso42k-option-hint">Not implemented at all</div>
+          <strong id="iso42k-opt-c-title">Absent - Not implemented</strong>
+          <div id="iso42k-opt-c-hint" class="iso42k-option-hint">No practices or policies in place</div>
         </div>
       </button>
     </div>

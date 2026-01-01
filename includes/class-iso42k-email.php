@@ -5,9 +5,9 @@ if (!defined('ABSPATH')) {
 
 /**
  * ISO42K_Email
- * Handles email sending for the ISO 42001 assessment
+ * Handles email sending for the EcoVadis Self Assessment
  * 
- * @version 7.4.0
+ * @version 2.0.0
  * 
  * Note: This class works with AI-generated content from ISO42K_AI class.
  * The AI class generates structured content in 7 sections: Key Insights, Overview (gap analysis), 
@@ -23,7 +23,7 @@ class ISO42K_Email {
         $email_settings = (array) get_option('iso42k_email_settings', []);
         
         $to = $lead['email'];
-        $subject = 'Your ISO 42001 Gap Analysis Results';
+        $subject = 'Your EcoVadis Sustainability Assessment Results';
         
         // Build email content
         $body = self::build_user_email_content($lead, $percent, $maturity, $ai_summary, $pdf_path, $email_settings);
@@ -70,7 +70,7 @@ class ISO42K_Email {
             return false;
         }
         
-        $subject = 'New ISO 42001 Assessment Results';
+        $subject = 'New EcoVadis Sustainability Assessment Lead';
         
         // Build email content
         $body = self::build_admin_email_content($lead, $percent, $maturity, $ai_summary, $email_settings);
@@ -122,7 +122,7 @@ class ISO42K_Email {
         $meeting_button_text = esc_html($email_settings['meeting_button_text'] ?? 'Book a Consultation');
         
         $content = '<!DOCTYPE html>';
-        $content .= '<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Your ISO 42001 Results</title></head><body>';
+        $content .= '<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Your EcoVadis Sustainability Assessment Results</title></head><body>';
         $content .= '<div style="max-width:650px;margin:0 auto;font-family:-apple-system, BlinkMacSystemFont, \'Segoe UI\', Roboto, Oxygen, Ubuntu, Cantarell, \'Open Sans\', \'Helvetica Neue\', sans-serif;padding:20px;">';
         
         // Header with logo and improved styling
@@ -130,7 +130,7 @@ class ISO42K_Email {
             $content .= '<div style="text-align:center;margin-bottom:30px;"><img src="' . $logo_url . '" alt="Company Logo" style="max-height:60px;"></div>';
         }
         
-        $content .= '<h1 style="color:#1f2937;text-align:center;margin-bottom:30px;font-weight:700;font-size:28px;">Your ISO 42001 Gap Analysis Results</h1>';
+        $content .= '<h1 style="color:#1f2937;text-align:center;margin-bottom:30px;font-weight:700;font-size:28px;">Your EcoVadis Sustainability Assessment Results</h1>';
         
         // Results summary with modern card design
         $content .= '<div style="background:linear-gradient(135deg, ' . $primary_color . ' 0%, ' . $secondary_color . ' 100%);color:white;padding:30px;text-align:center;border-radius:12px;margin-bottom:25px;box-shadow: 0 10px 25px rgba(37, 99, 235, 0.2);">';
@@ -207,7 +207,7 @@ class ISO42K_Email {
         
         // Footer with subtle branding
         $content .= '<div style="margin-top:30px;text-align:center;color:#9ca3af;font-size:12px;padding-top:15px;border-top:1px solid #e5e7eb;">';
-        $content .= '<p style="margin:0;">Powered by ISO 42001 Gap Analysis Tool</p>';
+        $content .= '<p style="margin:0;">Powered by EcoVadis Self Assessment Tool</p>';
         $content .= '<p style="margin:0;margin-top:5px;">© ' . date('Y') . ' ' . esc_html($email_settings['from_name'] ?? get_bloginfo('name')) . '. All rights reserved.</p>';
         $content .= '</div>';
         
@@ -476,7 +476,7 @@ class ISO42K_Email {
         $content .= '<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>New Assessment Lead</title></head><body>';
         $content .= '<div style="max-width:650px;margin:0 auto;font-family:-apple-system, BlinkMacSystemFont, \'Segoe UI\', Roboto, Oxygen, Ubuntu, Cantarell, \'Open Sans\', \'Helvetica Neue\', sans-serif;padding:20px;">';
         
-        $content .= '<h1 style="color:#1f2937;margin-bottom:30px;font-weight:700;font-size:28px;">New ISO 42001 Assessment Lead</h1>';
+        $content .= '<h1 style="color:#1f2937;margin-bottom:30px;font-weight:700;font-size:28px;">New EcoVadis Sustainability Assessment Lead</h1>';
         
         // Lead info
         $content .= '<div style="background:#f9fafb;padding:25px;border-radius:12px;margin-bottom:25px;box-shadow: 0 4px 6px rgba(0,0,0,0.05);border: 1px solid #e5e7eb;">';
@@ -552,8 +552,8 @@ class ISO42K_Email {
 
         $email_settings = (array) get_option('iso42k_email_settings', []);
         
-        $subject = 'ISO 42001 Assessment - Test Email';
-        $body = 'This is a test email from your ISO 42001 Gap Analysis plugin. Email configuration is working correctly!';
+        $subject = 'EcoVadis Assessment - Test Email';
+        $body = 'This is a test email from your EcoVadis Self Assessment plugin. Email configuration is working correctly!';
         
         $headers = [
             'Content-Type: text/html; charset=UTF-8',
@@ -622,8 +622,8 @@ class ISO42K_Email {
             ];
         }
 
-        $subject = 'ISO 42001 Assessment - Test Admin Notification';
-        $body = 'This is a test admin notification from your ISO 42001 Gap Analysis plugin. Admin email configuration is working correctly!';
+        $subject = 'EcoVadis Assessment - Test Admin Notification';
+        $body = 'This is a test admin notification from your EcoVadis Self Assessment plugin. Admin email configuration is working correctly!';
         
         $headers = [
             'Content-Type: text/html; charset=UTF-8',
