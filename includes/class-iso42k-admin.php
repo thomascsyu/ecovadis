@@ -141,8 +141,8 @@ class ISO42K_Admin {
   public static function register_menus() {
     // Main menu
     add_menu_page(
-      'ISO 42001 Gap Analysis',
-      'ISO 42001',
+      'Ecovadis Gap Analysis',
+      'Ecovadis',
       'manage_options',
       'iso42k-dashboard',
       [__CLASS__, 'render_dashboard'],
@@ -259,7 +259,7 @@ class ISO42K_Admin {
     ?>
     <div class="iso42k-container">
       <div class="iso42k-dashboard-header">
-        <h1 class="iso42k-dashboard-title">ISO 42001 Gap Analysis Dashboard</h1>
+        <h1 class="iso42k-dashboard-title">Ecovadis Gap Analysis Dashboard</h1>
         <p>Manage leads, configuration, AI analysis, and system controls.</p>
       </div>
       
@@ -309,7 +309,7 @@ class ISO42K_Admin {
     ?>
     <div class="iso42k-container">
       <div class="iso42k-dashboard-header">
-        <h1 class="iso42k-dashboard-title">ISO 42001 Assessment Settings</h1>
+        <h1 class="iso42k-dashboard-title">Ecovadis Assessment Settings</h1>
       </div>
 
       <div class="iso42k-settings-container">
