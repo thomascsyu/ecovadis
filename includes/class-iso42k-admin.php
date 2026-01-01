@@ -9,7 +9,7 @@ if (!defined('ABSPATH')) exit;
  */
 class ISO42K_Admin {
 
- public static function init() {
+  public static function init() {
     // Verify required constants are defined
     if (!defined('DUO_ISO42K_PATH') || !defined('DUO_ISO42K_URL')) {
         error_log('ISO42K: Required constants DUO_ISO42K_PATH or DUO_ISO42K_URL are not defined');
